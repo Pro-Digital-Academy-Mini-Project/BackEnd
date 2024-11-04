@@ -3,17 +3,28 @@ const { isEmail } = require('validator');
 const bcrypt = require('bcrypt');
 
 const userSchema = new mongoose.Schema({
+    username: {
+        type: String,
+        required: true,
+        unique: true
+    },
     email: {
         type: String,
-        required: [true, "이메일을 입력해 주세요."],
-        unique: true,
-        lowecase: true,
-        validate: [isEmail, "올바른 이메일 형식이 아닙니다."],
+        required: true,
+        unique: true
     },
     password: {
         type: String,
-        required: [true, "비밀번호를 입력하시오."],
+        required: true
     },
+    created_at: {
+        type: Date,
+        default: Date.now
+    },
+    updated_at: {
+        type: Date,
+        default: Date.now
+    }
 });
 
 userSchema.statics.signUp = async function (email, password) {

@@ -8,10 +8,8 @@ const session = require('express-session');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-var boardRouter = require('./routes/board');
-var birdsRouter = require('./routes/birds');
-var commentRouter = require('./routes/comment');
-var todoRouter = require('./routes/todo');
+var commentRouter = require('./routes/comments');
+var timelinecommentRouter = require('./routes/timelinecomments');
 
 const mongoose = require('./db');
 
@@ -57,6 +55,8 @@ app.use((req, res, next) => {
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/Comment', commentRouter);
+app.use('/timelinecomment', timelinecommentRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
