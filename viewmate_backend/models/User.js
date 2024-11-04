@@ -27,20 +27,22 @@ const userSchema = new mongoose.Schema({
     }
 });
 
-userSchema.statics.signUp = async function (email, password) {
+userSchema.statics.signUp = async function (username, email, password) {
     const salt = await bcrypt.genSalt();
     console.log(salt);
     try {
         const hashedPassword = await bcrypt.hash(password, salt);
-        const user = await this.create({ email, password: hashedPassword });
+        const user = await this.create({ username, email, password: hashedPassword });
         return {
             _id: user._id,
             email: user.email,
+            password: user.password
         };
     } catch (err) {
         throw err;
     }
 };
+
 
 userSchema.statics.login = async function (email, password) {
     if (await this.findOne({ email })) {
