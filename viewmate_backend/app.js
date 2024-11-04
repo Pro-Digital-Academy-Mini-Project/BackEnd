@@ -10,6 +10,8 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var commentRouter = require('./routes/comments');
 var timelinecommentRouter = require('./routes/timelinecomments');
+var roomsRouter = require('./routes/rooms');
+var videosRouter = require('./routes/videos')
 
 const mongoose = require('./db');
 
@@ -57,6 +59,8 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/Comment', commentRouter);
 app.use('/timelinecomment', timelinecommentRouter);
+app.use('/rooms', roomsRouter);
+app.use('/videos', videosRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
