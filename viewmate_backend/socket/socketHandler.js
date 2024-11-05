@@ -9,16 +9,19 @@ const socketHandler = (io) => {
     socket.on('joinRoom', (roomId) => {
       console.log(`클라이언트 ${socket.id}가 룸 ${roomId}에 참가 요청`);
       
-      // 새로운 룸이면 Set에 추가
-      if (!activeRooms.has(roomId)) {
-        activeRooms.add(roomId);
+      // 이미 해당 룸에 있는지 확인
+      if (!socket.rooms.has(roomId)) {
+        // 새로운 룸이면 Set에 추가
+        if (!activeRooms.has(roomId)) {
+          activeRooms.add(roomId);
+        }
+        
+        // 해당 룸에 참가
+        socket.join(roomId);
+        
+        // 룸 참가 알림 (socket.broadcast를 사용하여 자신을 제외한 다른 사용자에게만 알림)
+        socket.broadcast.to(roomId).emit('receiveMessage', `새로운 사용자가 입장했습니다: ${socket.id}`);
       }
-      
-      // 해당 룸에 참가
-      socket.join(roomId);
-      
-      // 룸 참가 알림
-      io.to(roomId).emit('receiveMessage', `새로운 사용자가 입장했습니다: ${socket.id}`);
     });
 
     // 메시지 전송 처리
