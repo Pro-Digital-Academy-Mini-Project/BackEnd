@@ -18,9 +18,15 @@ const socketHandler = (io) => {
         
         // 해당 룸에 참가
         socket.join(roomId);
+        socket.data.roomId = roomId;
         
         // 룸 참가 알림 (socket.broadcast를 사용하여 자신을 제외한 다른 사용자에게만 알림)
         socket.broadcast.to(roomId).emit('receiveMessage', `새로운 사용자가 입장했습니다: ${socket.id}`);
+
+        // 룸에 접속한 사용자 수 계산
+        const roomUsersCount = io.sockets.adapter.rooms.get(roomId)?.size || 0;
+        // 참가한 사용자에게 현재 룸의 사용자 수를 알림
+        io.to(roomId).emit('roomUserCount', roomUsersCount);
       }
     });
 
@@ -41,7 +47,14 @@ const socketHandler = (io) => {
     socket.on('leaveRoom', (roomId) => {
       socket.leave(roomId);
       console.log(`클라이언트 ${socket.id}가 룸 ${roomId}에서 나갔습니다`);
-      io.to(roomId).emit('receiveMessage', `사용자가 퇴장했습니다: ${socket.id}`);
+      
+      //방 나감 알림
+      socket.broadcast.to(roomId).emit('receiveMessage', `클라이언트가 방을 나갔습니다: ${socket.id}`);
+
+      // 룸에 접속한 사용자 수 계산
+      const roomUsersCount = io.sockets.adapter.rooms.get(roomId)?.size || 0;
+      // 참가한 사용자에게 현재 룸의 사용자 수를 알림
+      io.to(roomId).emit('roomUserCount', roomUsersCount);
       
       // 해당 룸에 아무도 없으면 activeRooms에서 제거
       const room = io.sockets.adapter.rooms.get(roomId);
@@ -53,7 +66,15 @@ const socketHandler = (io) => {
     
     // 연결 끊김 처리
     socket.on('disconnect', () => {
-      console.log('클라이언트가 연결을 끊었습니다:', socket.id);
+      const roomId = socket.data.roomId;
+
+      //연결 끊김 알림
+      socket.broadcast.to(roomId).emit('receiveMessage', `클라이언트 연결이 끊겼습니다: ${socket.id}`);
+      
+      // 룸에 접속한 사용자 수 계산
+      const roomUsersCount = io.sockets.adapter.rooms.get(roomId)?.size || 0;
+      // 참가한 사용자에게 현재 룸의 사용자 수를 알림
+      io.to(roomId).emit('roomUserCount', roomUsersCount);
     });
   });
 };
