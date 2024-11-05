@@ -1,3 +1,6 @@
+# DB
+./db.js
+
 # Logs
 logs
 *.log
