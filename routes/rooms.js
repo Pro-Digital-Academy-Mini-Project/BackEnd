@@ -5,7 +5,7 @@ const Room = require('../models/Room');
 const Video = require('../models/Video'); // Video 모델 경로
 
 router.get('/', (req, res, next) => {
-  Room.find().then(rooms => {
+  Room.find().populate('video_id').then(rooms => {
     res.json(rooms);
   }).catch(err => {
     next(err)
