@@ -17,6 +17,10 @@ const roomSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    flag: {
+        type: String,
+        default: '1' ,// 방이 없어지면, default 0 => 나중에 get할 때 flag 1만 가져옴
+    },
     video_id: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Video', // Video 모델을 참조

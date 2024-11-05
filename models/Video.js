@@ -4,12 +4,8 @@ const videoSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    url: {
+    video_id: {
         type: String,
-        required: true
-    },
-    duration: {
-        type: Number, // 길이 (초 단위)
         required: true
     },
     created_at: {
