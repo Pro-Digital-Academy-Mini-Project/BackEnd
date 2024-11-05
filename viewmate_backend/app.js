@@ -16,51 +16,17 @@ var videosRouter = require('./routes/videos')
 const mongoose = require('./db');
 
 var app = express();
-const http = require("http");  //서버의 정보
-const server = http.createServer(app);
 
-const { Server } = require("socket.io");
-app.io = new Server(server, {
-  cors: {
-    origin: "http://localhost:5173", // 클라이언트 URL
-    methods: ["GET", "POST"],
-    credentials: true
-  }
-});
-
-app.use((req, res) => {
-  res.header("Access-Control-Allow-Origin", "*"); // 모든 도메인 허용
-});
-
-// 채팅방 목록
-const rooms = ['room1', 'room2', 'room3'];
-
-// 각 채팅방에 대한 네임스페이스 설정
-rooms.forEach(room => {
-  const namespace = app.io.of(`/${room}`);
-  namespace.on('connection', (socket) => {
-    console.log(`${room}에 클라이언트가 연결되었습니다:`, socket.id);
-    // 메시지 이벤트 처리
-    socket.on('sendMessage', (msg) => {
-      console.log(`[${room}] 받은 메시지:`, msg);
-      namespace.emit('receiveMessage', msg); // 해당 방의 모든 클라이언트에 메시지 전송
-    });
-    // 연결 끊김 처리
-    socket.on('disconnect', () => {
-      console.log(`${room} 클라이언트가 연결을 끊었습니다:`, socket.id);
-    });
-  });
-});
+app.use(cors({
+  origin: process.env.CLIENT_URL || "http://localhost:5173",
+  credentials: true
+}));
 
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(cors({
-  origin: "http://localhost:5173"
-}));
-
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "<my-secret>",
