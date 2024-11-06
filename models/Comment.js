@@ -7,8 +7,8 @@ const commentSchema = new mongoose.Schema({
     required: true,
   },
   room_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Room", // Room 모델을 참조
+    type: String, //mongoose.Schema.Types.ObjectId,
+    // ref: "Room", // Room 모델을 참조
     required: true,
     index: true,
   },
