@@ -35,6 +35,7 @@ userSchema.statics.signUp = async function (username, email, password) {
         const user = await this.create({ username, email, password: hashedPassword });
         return {
             _id: user._id,
+            username: user.username,
             email: user.email,
             password: user.password
         };
@@ -45,14 +46,22 @@ userSchema.statics.signUp = async function (username, email, password) {
 
 
 userSchema.statics.login = async function (email, password) {
-    if (await this.findOne({ email })) {
-        if (await bcrypt.compare(password, (await this.findOne({ email })).password)) {
-            return (await this.findOne({ email })).visibleUser;
+    const user = await this.findOne({ email });
+    if (user) {
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (isMatch) {
+            // username을 포함하여 반환
+            return {
+                _id: user._id,
+                email: user.email,
+                username: user.username
+            };
         }
-        throw Error("incorrect password");
+        throw new Error("Incorrect password");
     }
-    throw Error("incorrect email");
+    throw new Error("Incorrect email");
 };
+
 
 const visibleUser = userSchema.virtual("visibleUser");
 visibleUser.get((value, virtual, doc) => {
