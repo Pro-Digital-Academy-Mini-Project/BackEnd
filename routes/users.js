@@ -1,11 +1,11 @@
-var express = require('express');
+var express = require("express");
 var router = express.Router();
 const { createToken, authenticate } = require("../utils/auth");
 
-const User = require('../models/User');
+const User = require("../models/User");
 
 /* GET users listing. */
-router.get('/', function (req, res, next) {
+router.get("/", function (req, res, next) {
   if (req.session.viewCount) {
     req.session.viewCount += 1;
   } else {
@@ -14,7 +14,7 @@ router.get('/', function (req, res, next) {
 
   console.log(req.session.viewCount);
   console.log(req.session);
-  res.send('respond with a resource');
+  res.send("respond with a resource");
 });
 
 router.post("/signup", async (req, res, next) => {
@@ -68,5 +68,7 @@ router.get("/protected", authenticate, async (req, res, next) => {
   console.log(req.user);
   res.json({ data: "민감한 데이터" });
 });
+
+//user 닉네임을 보내면 user id를 반환하는 식? room 만들 때 user _id 필요함
 
 module.exports = router;
