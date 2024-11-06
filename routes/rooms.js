@@ -6,7 +6,7 @@ const Video = require("../models/Video"); // Video 모델 경로
 
 router.get("/", (req, res, next) => {
   const { page = 1, room_name } = req.query;
-  const limit = 8;
+  const limit = 4;
   const query = room_name ? { room_name: new RegExp(room_name, "i") } : {};
 
   Room.find(query)
