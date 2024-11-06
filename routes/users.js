@@ -5,7 +5,7 @@ const { createToken, authenticate } = require("../utils/auth");
 const User = require('../models/User');
 
 /* GET users listing. */
-router.get('/', function (req, res, next) {
+router.get('/',function (req, res, next) {
   if (req.session.viewCount) {
     req.session.viewCount += 1;
   } else {
@@ -42,6 +42,7 @@ router.post("/login", async (req, res, next) => {
     res.cookie("authToken", token, {
       httpOnly: true,
       maxAge: tokenMaxAge * 1000,
+      // sameSite: 'none'
     });
 
     console.log(user);
