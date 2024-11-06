@@ -9,6 +9,7 @@ var debug = require('debug')('viewmate-backend:server');
 var http = require('http');
 const { Server } = require("socket.io");
 const socketHandler = require('../socket/socketHandler');
+const timelineSocketHandler = require('../socket/timelineSocketHandler');
 
 /**
  * Get port from environment and store in Express.
@@ -40,6 +41,7 @@ const io = new Server(server, {
  */
 
 socketHandler(io);
+timelineSocketHandler(io);
 
 /**
  * Listen on provided port, on all network interfaces.
