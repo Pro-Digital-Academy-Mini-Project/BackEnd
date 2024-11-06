@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-
+const bcrypt = require("bcrypt");
 const Room = require("../models/Room");
 const Video = require("../models/Video"); // Video 모델 경로
 
@@ -35,15 +35,33 @@ router.get("/:id", (req, res, next) => {
       next(err);
     });
 });
-router.post("/", (req, res, next) => {
-  console.log(req.body);
-  Room.create(req.body)
-    .then((room) => {
-      res.json(room);
-    })
-    .catch((err) => {
-      next(err);
-    });
+router.post("/", async (req, res, next) => {
+  try {
+    if (req.body.room_password) {
+      const salt = await bcrypt.genSalt();
+      req.body.room_password = await bcrypt.hash(req.body.room_password, salt);
+    }
+    const room = await Room.create(req.body);
+    res.json(room);
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post("/verify-password", async (req, res, next) => {
+  const { roomId, password } = req.body;
+
+  try {
+    const room = await Room.findById(roomId);
+    if (!room || !room.room_password) {
+      return res.status(400).json({ isValid: false });
+    }
+
+    const isValid = await bcrypt.compare(password, room.room_password);
+    res.json({ isValid });
+  } catch (error) {
+    next(error);
+  }
 });
 
 module.exports = router;
