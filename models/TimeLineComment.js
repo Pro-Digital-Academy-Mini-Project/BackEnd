@@ -9,7 +9,8 @@ const timelineCommentSchema = new mongoose.Schema({
     room_id: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Room', // Room 모델 참조
-        required: true
+        required: true,
+        index: true
     },
     timestamp: {
         type: Number, // 영상의 특정 시간 (밀리초 단위)
