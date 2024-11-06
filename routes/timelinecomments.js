@@ -1,80 +1,63 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 
-const TimeLineComment = require('../models/TimeLineComment');
+const TimeLineComment = require("../models/TimeLineComment");
 
-
-router.get('/', (req, res, next) => {
-  TimeLineComment.find().then(timeLineComments => {
-    res.cookie("my-cookie", "cookie-value", {
-      maxAge: 1000 * 60 * 60 * 24,
-      secure: false,
-      httpOnly: true,
-      signed: false
+router.get("/", (req, res, next) => {
+  TimeLineComment.findByRoomId()
+    .then((timeLineComments) => {
+      res.cookie("my-cookie", "cookie-value", {
+        maxAge: 1000 * 60 * 60 * 24,
+        secure: false,
+        httpOnly: true,
+        signed: false,
+      });
+      res.json(timeLineComments);
+    })
+    .catch((err) => {
+      next(err);
     });
-    res.json(timeLineComments);
-  }).catch(err => {
-    next(err)
-  })
 });
 
-router.post('/', (req, res, next) => {
-  console.log(req.body);
-  TimeLineComment.create(req.body).then(timeLineComment => {
-    res.json(timeLineComment)
-  }).catch(err => {
-    next(err)
-  })
+router.post("/", (req, res, next) => {
+  console.log(req);
+  // token -> user.email -> user._id 로 저장
+  const comment = {
+    user_id: "672871a44f2b2bf03d7c9192",
+    room_id: req.body.room_id,
+    timestamp: req.body.timestamp,
+    content: req.body.content,
+  };
+  
+  TimeLineComment.create(comment)
+    .then((timeLineComment) => {
+      res.json(timeLineComment);
+    })
+    .catch((err) => {
+      next(err);
+    });
 });
 
-const Comment = require('../models/Comment');
+router.get("/:roomId", async (req, res, next) => {
+  try {
+    const timeLineComments = await TimeLineComment.find({
+      room_id: req.params.roomId,
+    });
 
-router.get('/:id/comment', (req, res, next) => {
-  console.log(req.params);
-  Comment.find({
-    timeLineComment: req.params.id
-  }).then(comments => {
-    res.json(comments);
-  }).catch(err => {
+    const returnComments = timeLineComments.map((comment) => {
+        return {
+          // jwt 토큰을 변환해서 username 가져오기
+          username: comment.user_id,
+          content: comment.content,
+          room_id: comment.room_id,
+          timestamp: comment.timestamp,
+          created_at: comment.created_at
+        }
+    })
+    res.json(returnComments);
+  } catch (err) {
     next(err);
-  })
+  }
 });
-
-router.post('/:id/comment', (req, res, next) => {
-  console.log(req.body);
-
-  Comment.create({
-    timeLineComment: req.params.id,
-    author: req.body.author,
-    content: req.body.content
-  }).then(comment => {
-    res.json(comment)
-  }).catch(err => {
-    next(err)
-  })
-});
-
-
-router.get('/:id', (req, res, next) => {
-  TimeLineComment.findById(req.params.id).then(timeLineComment => {
-    let boardHistory = req.session.boardPath;
-    if (boardHistory) {
-      boardHistory = JSON.parse(boardHistory);
-    } else {
-      boardHistory = []
-    }
-
-    boardHistory.push(timeLineComment.title);
-    if (boardHistory.length > 10) {
-      boardHistory.shift();
-    }
-    req.session.boardPath = JSON.stringify(boardHistory);
-    console.log("TimeLineComment Path session : ", req.session.boardPath);
-    res.send(timeLineComment);
-  }).catch(err => {
-    next(err);
-  })
-});
-
 
 module.exports = router;
