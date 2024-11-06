@@ -8,12 +8,11 @@ router.get("/:roomId", async function (req, res, next) {
     const totalComments = await Comment.find({
       room_id: req.params.roomId,
     });
-
     const returnComments = totalComments.map((comment) => {
       return {
         username: comment.user_id,
-        content: comment.content,
         room_id: comment.room_id,
+        content: comment.content,
         created_at: comment.created_at,
       };
     });
@@ -23,13 +22,14 @@ router.get("/:roomId", async function (req, res, next) {
   }
 });
 
-router.post("/:roomId", async function (req, res, next) {
+router.post("/", async function (req, res, next) {
   console.log(req);
   // token -> user.email -> user._id 로 저장
   const comment = {
     user_id: "672306a63c7aefa987bcf5b3",
     room_id: req.body.room_id,
     content: req.body.content,
+    created_at: req.body.created_at,
   };
 
   Comment.create(comment)
