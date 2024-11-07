@@ -7,11 +7,19 @@ const User = require("../models/User");
 
 router.get("/", (req, res, next) => {
   const { page = 1, room_name } = req.query;
-  const limit = 4;
+  const limit = 6;
   const query = room_name ? { room_name: new RegExp(room_name, "i") } : {};
 
   Room.find(query)
-    .populate("video_id")
+    .populate({
+      path: "video_id",
+      select: "video_url_id -_id", // video_id에서 video_url_id만 선택
+    })
+    .populate({
+      path: "owner",
+      select: "username -_id", // owner에서 username만 선택
+    })
+    .select("_id room_name is_private") // Room에서 필요한 필드 선택
     .skip((page - 1) * limit)
     .limit(limit)
     .then((rooms) => {
@@ -21,7 +29,6 @@ router.get("/", (req, res, next) => {
       next(err);
     });
 });
-
 // 특정 Room의 상세 정보와 관련된 Video 정보 가져오기
 router.get("/:id", (req, res, next) => {
   Room.findById(req.params.id)

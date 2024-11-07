@@ -28,7 +28,7 @@ const roomSchema = new mongoose.Schema({
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User", // User 모델을 참조
+    ref: "user", // User 모델을 참조
   },
   comments: [
     {
