@@ -2,7 +2,8 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const Room = require("../models/Room");
-const Video = require("../models/Video"); // Video 모델 경로
+const Video = require("../models/Video");
+const User = require("../models/User");
 
 router.get("/", (req, res, next) => {
   const { page = 1, room_name } = req.query;
@@ -29,22 +30,54 @@ router.get("/:id", (req, res, next) => {
       if (!room) {
         return res.status(404).json({ message: "Room not found" });
       }
-      res.json(room);
+      res.json({
+        room_name: room.room_name,
+        room_video_id: room.video_id.video_url_id,
+        is_private: room.is_private,
+      });
     })
     .catch((err) => {
       next(err);
     });
 });
-router.post("/", async (req, res, next) => {
+
+router.post("/", async (req, res) => {
   try {
-    if (req.body.room_password) {
-      const salt = await bcrypt.genSalt();
-      req.body.room_password = await bcrypt.hash(req.body.room_password, salt);
+    const { room_name, video_url_id, owner_name, room_password, is_private } =
+      req.body;
+
+    // 1. video_url_id를 사용하여 Video를 생성 (또는 기존에 있는지 확인)
+    let video = await Video.findOne({ video_url_id });
+    if (!video) {
+      video = new Video({ video_url_id });
+      await video.save();
     }
-    const room = await Room.create(req.body);
-    res.json(room);
-  } catch (err) {
-    next(err);
+
+    // 2. owner_name을 사용하여 User를 찾기
+    const user = await User.findOne({ username: owner_name });
+    if (!user) {
+      return res.status(404).json({ message: "Owner not found" });
+    }
+
+    // 3. bcrypt로 room_password 저장
+    const salt = await bcrypt.genSalt();
+    const hashedPassword = await bcrypt.hash(room_password, salt);
+
+    // 4. Room을 생성하고 video_id와 user_id를 포함하여 저장
+    const room = new Room({
+      room_name,
+      room_password: hashedPassword,
+      is_private,
+      video_id: video._id,
+      owner: user._id,
+    });
+
+    await room.save();
+
+    res.status(201).json(room._id);
+  } catch (error) {
+    console.error("Error creating room:", error);
+    res.status(500).json({ message: "Server error" });
   }
 });
 
