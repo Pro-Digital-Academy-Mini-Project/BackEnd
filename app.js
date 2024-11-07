@@ -57,12 +57,12 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
-app.use('/Comment', commentRouter);
-app.use('/timelinecomment', timelinecommentRouter);
-app.use('/rooms', roomsRouter);
-app.use('/videos', videosRouter);
+app.use('/api', indexRouter);
+app.use('/api/users', usersRouter);
+app.use('/api/Comment', commentRouter);
+app.use('/api/timelinecomment', timelinecommentRouter);
+app.use('/api/rooms', roomsRouter);
+app.use('/api/videos', videosRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

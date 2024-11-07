@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const Room = require("../models/Room");
 const Video = require("../models/Video");
 const User = require("../models/User");
@@ -31,6 +31,7 @@ router.get("/:id", (req, res, next) => {
         return res.status(404).json({ message: "Room not found" });
       }
       res.json({
+        roomId : room._id,
         room_name: room.room_name,
         room_video_id: room.video_id.video_url_id,
         is_private: room.is_private,

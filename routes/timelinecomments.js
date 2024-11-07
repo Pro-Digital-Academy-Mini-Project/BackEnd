@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const TimeLineComment = require("../models/TimeLineComment");
+const User = require("../models/User");
 
 router.get("/", (req, res, next) => {
   TimeLineComment.findByRoomId()
@@ -19,16 +20,20 @@ router.get("/", (req, res, next) => {
     });
 });
 
-router.post("/", (req, res, next) => {
-  console.log(req);
-  // token -> user.email -> user._id 로 저장
+router.post("/", async (req, res, next) => {
+  const commentUser = req.body.username;
+  const user = await User.findOne({ username: commentUser });
+  if (!user) {
+    return res.status(404).json({ message: "Owner not found" });
+  }
   const comment = {
-    user_id: "672871a44f2b2bf03d7c9192",
+    user_id: user._id,
+    username: user.username,
     room_id: req.body.room_id,
     timestamp: req.body.timestamp,
     content: req.body.content,
   };
-  
+
   TimeLineComment.create(comment)
     .then((timeLineComment) => {
       res.json(timeLineComment);
@@ -45,15 +50,14 @@ router.get("/:roomId", async (req, res, next) => {
     });
 
     const returnComments = timeLineComments.map((comment) => {
-        return {
-          // jwt 토큰을 변환해서 username 가져오기
-          username: comment.user_id,
-          content: comment.content,
-          room_id: comment.room_id,
-          timestamp: comment.timestamp,
-          created_at: comment.created_at
-        }
-    })
+      return {
+        username: comment.username,
+        content: comment.content,
+        room_id: comment.room_id,
+        timestamp: comment.timestamp,
+        created_at: comment.created_at,
+      };
+    });
     res.json(returnComments);
   } catch (err) {
     next(err);
