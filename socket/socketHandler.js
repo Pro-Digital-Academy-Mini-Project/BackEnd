@@ -45,6 +45,19 @@ const socketHandler = (io) => {
       });
     });
 
+    // Timeline메시지 전송 처리
+    socket.on("sendTimeLineMessage", (data) => {
+      const { roomId, message, timestamp } = data;
+      console.log("sendTimeLineMessage");
+      console.log(`[${roomId}] 메시지:`, message);
+      io.to(roomId).emit("receiveTimeLineMessage", {
+        username: "testuser",
+        roomId: `${roomId}`,
+        message: `${message}`,
+        timestamp: `${timestamp}`,
+      });
+    });
+
     // 룸 나가기 처리
     socket.on("leaveRoom", (roomId) => {
       socket.leave(roomId);
