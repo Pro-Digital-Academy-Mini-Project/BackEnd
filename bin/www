@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+require('dotenv').config();
 
 /**
  * Module dependencies.
@@ -41,7 +42,6 @@ const io = new Server(server, {
  */
 
 socketHandler(io);
-// timelineSocketHandler(io);
 
 /**
  * Listen on provided port, on all network interfaces.
