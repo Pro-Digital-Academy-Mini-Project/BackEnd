@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const Room = require("../models/Room");
 const Video = require("../models/Video"); // Video 모델 경로
 
