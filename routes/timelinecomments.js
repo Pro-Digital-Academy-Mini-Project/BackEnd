@@ -4,22 +4,6 @@ const router = express.Router();
 const TimeLineComment = require("../models/TimeLineComment");
 const User = require("../models/User");
 
-router.get("/", (req, res, next) => {
-  TimeLineComment.findByRoomId()
-    .then((timeLineComments) => {
-      res.cookie("my-cookie", "cookie-value", {
-        maxAge: 1000 * 60 * 60 * 24,
-        secure: false,
-        httpOnly: true,
-        signed: false,
-      });
-      res.json(timeLineComments);
-    })
-    .catch((err) => {
-      next(err);
-    });
-});
-
 router.post("/", async (req, res, next) => {
   const commentUser = req.body.username;
   const user = await User.findOne({ username: commentUser });
@@ -39,6 +23,7 @@ router.post("/", async (req, res, next) => {
       res.json(timeLineComment);
     })
     .catch((err) => {
+      console.error(err);
       next(err);
     });
 });
