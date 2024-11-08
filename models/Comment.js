@@ -6,6 +6,10 @@ const commentSchema = new mongoose.Schema({
     ref: "User", // User 모델을 참조
     required: true,
   },
+  username: {
+    type: String,
+    requried: true,
+  },
   room_id: {
     type: String, //mongoose.Schema.Types.ObjectId,
     // ref: "Room", // Room 모델을 참조

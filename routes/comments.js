@@ -2,6 +2,7 @@ var express = require("express");
 var router = express.Router();
 
 const Comment = require("../models/Comment");
+const User = require("../models/User");
 
 router.get("/:roomId", async function (req, res, next) {
   try {
@@ -10,7 +11,7 @@ router.get("/:roomId", async function (req, res, next) {
     });
     const returnComments = totalComments.map((comment) => {
       return {
-        username: comment.user_id,
+        username: comment.username,
         room_id: comment.room_id,
         content: comment.content,
         created_at: comment.created_at,
@@ -23,10 +24,14 @@ router.get("/:roomId", async function (req, res, next) {
 });
 
 router.post("/", async function (req, res, next) {
-  console.log(req);
-  // token -> user.email -> user._id 로 저장
+  const commentUser = req.body.username;
+  const user = await User.findOne({ username: commentUser });
+  if (!user) {
+    return res.status(404).json({ message: "Owner not found" });
+  }
   const comment = {
-    user_id: "672306a63c7aefa987bcf5b3",
+    user_id: user._id,
+    username: user.username,
     room_id: req.body.room_id,
     content: req.body.content,
     created_at: req.body.created_at,
