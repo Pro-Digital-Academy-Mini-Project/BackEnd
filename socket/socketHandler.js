@@ -64,9 +64,9 @@ const socketHandler = (io) => {
       console.log(`클라이언트 ${socket.id}가 룸 ${roomId}에서 나갔습니다`);
 
       //방 나감 알림
-      socket.broadcast
-        .to(roomId)
-        .emit("receiveMessage", `클라이언트가 방을 나갔습니다: ${socket.id}`);
+      // socket.broadcast
+      //   .to(roomId)
+      //   .emit("receiveMessage", `클라이언트가 방을 나갔습니다: ${socket.id}`);
 
       // 룸에 접속한 사용자 수 계산
       const roomUsersCount = io.sockets.adapter.rooms.get(roomId)?.size || 0;
@@ -85,6 +85,7 @@ const socketHandler = (io) => {
     socket.on("disconnect", () => {
       const roomId = socket.data.roomId;
 
+      console.log("클라이언트 연결이 끊겼습니다.");
       //연결 끊김 알림
       socket.broadcast
         .to(roomId)
