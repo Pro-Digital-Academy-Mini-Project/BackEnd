@@ -15,6 +15,7 @@ router.get("/:roomId", async function (req, res, next) {
         room_id: comment.room_id,
         content: comment.content,
         created_at: comment.created_at,
+        likes: comment.likes,
       };
     });
     res.json(returnComments);
@@ -44,6 +45,26 @@ router.post("/", async function (req, res, next) {
     .catch((err) => {
       next(err);
     });
+});
+
+router.put("/like", async (req, res, next) => {
+  const { created_at, roomId } = req.body;
+  try {
+    console.log("created_at ", created_at);
+    const updatedComment = await Comment.findOneAndUpdate(
+      { created_at: created_at, room_id: roomId },
+      { $inc: { likes: 1 } },
+      { new: true }
+    );
+
+    if (!updatedComment) {
+      return res.status(404).json({ message: "댓글을 찾을 수 없습니다." });
+    }
+
+    res.json(updatedComment);
+  } catch (err) {
+    next(err);
+  }
 });
 
 module.exports = router;

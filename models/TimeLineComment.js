@@ -28,6 +28,10 @@ const timelineCommentSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  likes: {
+    type: Number,
+    default: 0, // 기본값 0으로 설정
+  },
 });
 
 const TimelineComment = mongoose.model(

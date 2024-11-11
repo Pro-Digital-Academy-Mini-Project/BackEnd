@@ -24,6 +24,10 @@ const commentSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  likes: {
+    type: Number,
+    default: 0, // 기본값 0으로 설정
+  },
 });
 
 const Comment = mongoose.model("Comment", commentSchema);

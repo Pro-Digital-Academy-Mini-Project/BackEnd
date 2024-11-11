@@ -41,9 +41,30 @@ router.get("/:roomId", async (req, res, next) => {
         room_id: comment.room_id,
         timestamp: comment.timestamp,
         created_at: comment.created_at,
+        likes: comment.likes,
       };
     });
     res.json(returnComments);
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.put("/like", async (req, res, next) => {
+  const { timestamp, roomId, content } = req.body;
+  console.log(timestamp, roomId, content);
+  try {
+    const updatedComment = await TimeLineComment.findOneAndUpdate(
+      { timestamp: timestamp, room_id: roomId, content: content },
+      { $inc: { likes: 1 } },
+      { new: true }
+    );
+
+    if (!updatedComment) {
+      return res.status(404).json({ message: "댓글을 찾을 수 없습니다." });
+    }
+
+    res.json(updatedComment);
   } catch (err) {
     next(err);
   }
