@@ -38,7 +38,7 @@ router.get("/:id", (req, res, next) => {
         return res.status(404).json({ message: "Room not found" });
       }
       res.json({
-        roomId : room._id,
+        roomId: room._id,
         room_name: room.room_name,
         room_video_id: room.video_id.video_url_id,
         is_private: room.is_private,
@@ -100,6 +100,18 @@ router.post("/verify-password", async (req, res, next) => {
 
     const isValid = await bcrypt.compare(password, room.room_password);
     res.json({ isValid });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.delete("/:id", async (req, res, next) => {
+  try {
+    const room = await Room.findByIdAndDelete(req.params.id);
+    if (!room) {
+      return res.status(404).json({ message: "Room not found" });
+    }
+    res.json({ message: "Room deleted successfully", roomId: req.params.id });
   } catch (error) {
     next(error);
   }
